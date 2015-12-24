@@ -7,5 +7,11 @@
 
 
 class TutorialPipeline(object):
-    def process_item(self, item, spider):
-        return item
+	def __init__ (self):
+		self.file = open ("appstore.dat", "wb")
+
+	def process_item(self, item, spider):
+		val = "{0}\t{1}\t{2}\t{3}\n".encode("UTF-8").format(item['appId'], item['title'], item['icon'], item['introduction'])
+		self.file.write(val)
+		return item
+

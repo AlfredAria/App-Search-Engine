@@ -13,7 +13,8 @@
 import scrapy
 import re
 
-from tutorial.items import AppItem;
+from scrapy.selector import Selector
+from tutorial.items import AppItem
 
 class AppSpider(scrapy.Spider):
     name = "app"
@@ -51,21 +52,24 @@ class AppSpider(scrapy.Spider):
 
     # Collect response information into Items
     def parse_dir_contents(self, response):
-
-        # Why aggregate multiple ones?
-        for sel in response.xpath('//ul/li'):
-            item = AppItem()
-            # I found multiple 'title' fields with this selector. Any better one?
-            item['title'] = sel.xpath('//span[@class="title"]/text()').extract()[0]
-            # App id is exactly the filename in the url
-            item['appId'] = response.meta["appId"]
-            # Get app_default when retrieving.
-            # How to solve this?
-            item['icon'] = sel.xpath('//img[@class="app-ico"]/@src').extract()
-            #
-            item['introduction'] = sel.xpath('//div[@id="app_strdesc"]/text()').extract()
-            yield item
-            break
+        sel = Selector (response)
+        item = AppItem()
+        # I found multiple 'title' fields with this selector. Any better one?
+        item['title'] = sel.xpath('//ul[@class="app-info-ul nofloat"]/li/p/span[@class="title"]/text()').extract_first().encode('utf-8')
+        item['url'] = response.url
+        # App id is exactly the filename in the url
+        item['appId'] = re.match(r'http://.*/(.*)', item['url']).group(1)
+        item['icon'] = sel.xpath('//img[@class="app-ico"]/@lazyload').extract()
+        item['introduction'] = sel.xpath('//meta[@name="description"]/@content').extract_first().encode('utf-8')
+        divs = sel.xpath('//div[@class="open-info"]')
+        recomm = ""
+        for div in divs:
+            url = div.xpath('./p[@class="name"]/a/@href').extract_first()
+            recommended_appid = re.match(r'http://.*/(.*)', url).group(1)
+            name = div.xpath('./p[@class="name"]/a/text()').extract_first().encode('utf-8')
+            recomm += "{0}:{1},".format(recommended_appid, name)
+        item['recommended'] = recomm
+        yield item
 
 
     # def set_crawler(self, crawler):

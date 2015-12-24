@@ -16,4 +16,6 @@ class AppItem (scrapy.Item):
 	title = scrapy.Field()         
 	appId = scrapy.Field()         
 	icon = scrapy.Field()         
-	introduction = scrapy.Field()         
+	introduction = scrapy.Field()
+	url = scrapy.Field()
+	recommended = scrapy.Field()        
