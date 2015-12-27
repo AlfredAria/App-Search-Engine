@@ -14,7 +14,7 @@ BOT_NAME = 'tutorial'
 SPIDER_MODULES = ['tutorial.spiders']
 NEWSPIDER_MODULE = 'tutorial.spiders'
 
-# Depth in experiment
+# Depth of crawling in experiment
 DEPTH_LIMIT = 3
 
 # Log level
@@ -30,7 +30,8 @@ LOG_LEVEL = 'INFO'
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-#DOWNLOAD_DELAY=3
+DOWNLOAD_DELAY=3
+
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN=16
 #CONCURRENT_REQUESTS_PER_IP=16
@@ -68,8 +69,11 @@ LOG_LEVEL = 'INFO'
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'tutorial.pipelines.TutorialPipeline': 300,
+	'tutorial.pipelines.TutorialPipeline': 300,
+	'tutorial.pipelines.AppIconPipeline': 1
 }
+
+IMAGES_STORE = '/Users/11707698d/scrapy/ImageStore/';
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html

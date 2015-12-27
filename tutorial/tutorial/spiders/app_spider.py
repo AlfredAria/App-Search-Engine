@@ -23,8 +23,8 @@ class AppSpider(scrapy.Spider):
         "http://appstore.huawei.com"
     ]
 
-    # Sadly reference here: http://blog.siliconstraits.vn/building-web-crawler-scrapy/
-    # manually records all crawled pages, otherwise there are duplications... 
+    # http://blog.siliconstraits.vn/building-web-crawler-scrapy/
+    # Avoid duplications by using a custom "crawled" array
     crawled_ones = []
 
     def parse(self, response):
@@ -60,6 +60,8 @@ class AppSpider(scrapy.Spider):
         # App id is exactly the filename in the url
         item['appId'] = re.match(r'http://.*/(.*)', item['url']).group(1)
         item['icon'] = sel.xpath('//img[@class="app-ico"]/@lazyload').extract()
+        item['image_urls'] = item['icon']
+
         item['introduction'] = sel.xpath('//meta[@name="description"]/@content').extract_first().encode('utf-8')
         divs = sel.xpath('//div[@class="open-info"]')
         recomm = ""

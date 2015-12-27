@@ -1,0 +1,40 @@
+Huang.Alfred
+
+1. install Pillow
+
+stdo pip install pillow
+
+2. Configure ITEM_PIPELINES and IMAGES_STORE in settings.py
+
+ITEM_PIPELINES = {
+	# Other pipelines ...,
+	'tutorial.pipelines.AppIconPipeline': 1
+}
+
+IMAGES_STORE = '/path/to/your/image/store';
+
+3. In pipelines.py, create a class that extends ImagePipeline and overwrite 3 methods like this:
+
+class AppIconPipeline(ImagesPipeline):
+
+	# Specify the naming convention for the downloaded images.
+	# Using the url file name here
+	def file_path(self, request, response=None, info=None):
+		print request.url
+		image_guid = request.url.split('/')[-1]
+		return 'full/%s' % (image_guid)
+
+	def get_media_requests(self, item, info):
+		for image_url in item['image_urls']:
+			yield scrapy.Request(image_url)
+
+	def item_completed(self, results, item, info):
+		image_paths = [x['path'] for ok, x in results if ok]
+		if not image_paths:
+			raise DropItem("Item contains no files")
+		return item
+		
+4. Create the necessary fields in item.py
+
+	image_urls = scrapy.Field() # A field to specify the image url
+	images = scrapy.Field() # Will store information about the downloaded images
